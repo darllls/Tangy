@@ -1,7 +1,8 @@
 ﻿@page "/product"
-@inject IProductRepository _ProductRepository
+@inject IProductRepository _productRepository
 @inject IJSRuntime _jsRuntime
-@inject IFileUpload _FileUpload
+@inject IFileUpload _fileUpload
+@inject NavigationManager _navigationManager
 
 <_DeleteConfirmation IsParentComponentProcessing="IsLoading" ConfirmationChanged="ConfirmDelete_Click"></_DeleteConfirmation>
 <div class="row mt-4">
@@ -9,41 +10,41 @@
         <h4 class="card-title text-primary">Product List</h4>
     </div>
     <div class="col-4 offset-2">
-        <a href="product/create" class="btn btn-primary form-control">Add New Product</a>
+        <a href="product/create" class="btn btn-primary form-control">Add New Product </a>
     </div>
-    <div class="col-12">
+    <div class="col-12 p-3">
         @if (Products.Any())
         {
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Shop Favourites</th>
-                        <th>Customer Favourites</th>
+                        <th>Shop Favorites</th>
+                        <th>Customer Favorites</th>
                         <th>Category</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach(var objProd in Products)
+                    @foreach (var prod in Products)
                     {
                         <tr>
                             <td>
-                                @objProd.Name
+                                @prod.Name
                             </td>
+                            <th>
+                                <input type="checkbox" disabled checked="@prod.ShopFavourites">
+                            </th>
+                            <th>
+                                <input type="checkbox" disabled checked="@prod.CustomerFavourites">
+                            </th>
+                            <th>
+                                @prod.Category.Name
+                            </th>
                             <td>
-                                <input type="checkbox" disabled checked="@objProd.ShopFavourites" />
-                            </td>
-                            <td>
-                                <input type="checkbox" disabled checked="@objProd.CustomerFavourites" />
-                            </td>
-                            <td>
-                                @objProd.Category.Name
-                            </td>
-                            <td>
-                                <NavLink href="@($"product/edit/{objProd.Id}")" class="btn-primary btn">Edit</NavLink>
-                                <NavLink href="@($"product/price/{objProd.Id}")" class="btn-success btn">Price</NavLink>
-                                <button class="btn btn-danger" @onclick="()=>HandleDelete(objProd.Id)">Delete</button>
+                                <NavLink href="@($"product/edit/{prod.Id}")" class="btn-primary btn">Edit</NavLink>
+                                <NavLink href="@($"product/price/{prod.Id}")" class="btn-success btn">Price</NavLink>
+                                <button class="btn btn-danger" @onclick="()=>HandleDelete(prod.Id)">Delete</button>
                             </td>
                         </tr>
                     }
@@ -54,14 +55,15 @@
         {
             if (IsLoading)
             {
+                //loading gif
                 <div class="text-center">
-                    <img src="/images/loading.gif" />
+                    <img src="/images/loading.gif">
                 </div>
-
             }
             else
             {
-                <p>No Records Found</p>
+                //no records
+                <p>No recrods found.</p>
             }
         }
     </div>
@@ -72,20 +74,39 @@
     public bool IsLoading { get; set; }
     private int DeleteProductId { get; set; } = 0;
 
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationState;
+        if (!authState.User.Identity.IsAuthenticated)
+        {
+            var uri = new Uri(_navigationManager.Uri);
+            _navigationManager.NavigateTo($"/identity/account/login?returnUrl={uri.LocalPath}", forceLoad: true);
+        }
+        else
+        {
+            if (!authState.User.IsInRole(Tangy_Common.SD.Role_Admin))
+            {
+                _navigationManager.NavigateTo("/ErrorPage");
+            }
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await LoadProducts();
         }
-
     }
 
     private async Task LoadProducts()
     {
         IsLoading = true;
         StateHasChanged();
-        Products = await _ProductRepository.GetAll();
+        Products = await _productRepository.GetAll();
         IsLoading = false;
         StateHasChanged();
     }
@@ -99,19 +120,20 @@
     public async Task ConfirmDelete_Click(bool isConfirmed)
     {
         IsLoading = true;
-        if(isConfirmed && DeleteProductId != 0)
+        if (isConfirmed && DeleteProductId != 0)
         {
-            ProductDTO product = await _ProductRepository.Get(DeleteProductId);
+            //delete
+            ProductDTO product = await _productRepository.Get(DeleteProductId);
             if (!product.ImageUrl.Contains("default.png"))
             {
-                _FileUpload.DeleteFile(product.ImageUrl);
+                _fileUpload.DeleteFile(product.ImageUrl);
+
             }
-            await _ProductRepository.Delete(DeleteProductId);
-            await _jsRuntime.ToastrSuccess("Product deleted successfully.");
+            await _productRepository.Delete(DeleteProductId);
+            await _jsRuntime.ToastrSuccess("Product Deleted successfully");
             await LoadProducts();
             await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
         }
         IsLoading = false;
     }
-
 }
