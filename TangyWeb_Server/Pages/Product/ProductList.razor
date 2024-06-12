@@ -20,7 +20,7 @@
                         <th>Name</th>
                         <th>Shop Favourites</th>
                         <th>Customer Favourites</th>
-                        <th>Prodegory</th>
+                        <th>Category</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -42,6 +42,7 @@
                             </td>
                             <td>
                                 <NavLink href="@($"product/edit/{objProd.Id}")" class="btn-primary btn">Edit</NavLink>
+                                <NavLink href="@($"product/price/{objProd.Id}")" class="btn-success btn">Price</NavLink>
                                 <button class="btn btn-danger" @onclick="()=>HandleDelete(objProd.Id)">Delete</button>
                             </td>
                         </tr>
