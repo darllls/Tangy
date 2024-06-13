@@ -41,14 +41,14 @@ namespace Tangy_Business.Repository
             if (orderHeader.Status == SD.Status_Confirmed)
             {
                 //refund
-                //var options = new Stripe.RefundCreateOptions
-                //{
-                //    Reason= Stripe.RefundReasons.RequestedByCustomer,
-                //    PaymentIntent = orderHeader.PaymentIntentId
-                //};
+                var options = new Stripe.RefundCreateOptions
+                {
+                    Reason = Stripe.RefundReasons.RequestedByCustomer,
+                    PaymentIntent = orderHeader.PaymentIntentId
+                };
 
-                //var service = new Stripe.RefundService();
-                //Stripe.Refund refund = service.Create(options);
+                var service = new Stripe.RefundService();
+                Stripe.Refund refund = service.Create(options);
 
                 orderHeader.Status = SD.Status_Refunded;
                 await _db.SaveChangesAsync();
@@ -137,7 +137,7 @@ namespace Tangy_Business.Repository
 
         }
 
-        public async Task<OrderHeaderDTO> MarkPaymentSuccessful(int id)
+        public async Task<OrderHeaderDTO> MarkPaymentSuccessful(int id, string paymentIntentId)
         {
             var data = await _db.OrderHeaders.FindAsync(id);
             if (data == null)
@@ -146,6 +146,7 @@ namespace Tangy_Business.Repository
             }
             if (data.Status==SD.Status_Pending)
             {
+                data.PaymentIntentId = paymentIntentId;
                 data.Status = SD.Status_Confirmed;
                 await _db.SaveChangesAsync();
                 return _mapper.Map<OrderHeader, OrderHeaderDTO>(data);

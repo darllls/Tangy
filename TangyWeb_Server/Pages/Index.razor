@@ -1,9 +1,40 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+@* Page Title *@
+<PageTitle>Home - Tangy Store Admin</PageTitle>
 
-<h1>Hello, world!</h1>
+@* Main Container *@
+<div style="text-align: center; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <header style="background-color: #f8f9fa; padding: 40px 20px; border-radius: 10px; margin-bottom: 20px;">
+        <h1 style="color: #333; font-size: 2.5em; margin-bottom: 10px;">Welcome to Tangy Store Admin</h1>
+        <p style="color: #666; font-size: 1.2em;">Manage your soap and candle products with ease.</p>
+    </header>
 
-Welcome to your new app.
+    @* Features Section *@
+    <section style="display: flex; justify-content: space-around; margin-top: 40px;">
+        <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 10px; width: 30%; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <i class="bi bi-box-seam" style="font-size: 2em; color: #007bff; margin-bottom: 15px;"></i>
+            <h3 style="color: #333; font-size: 1.5em; margin-bottom: 10px;">Manage Products</h3>
+            <p style="color: #666; font-size: 1em;">View, add, edit, and delete products easily.</p>
+        </div>
+        <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 10px; width: 30%; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <i class="bi bi-cart" style="font-size: 2em; color: #007bff; margin-bottom: 15px;"></i>
+            <h3 style="color: #333; font-size: 1.5em; margin-bottom: 10px;">Manage Orders</h3>
+            <p style="color: #666; font-size: 1em;">Track and manage customer orders efficiently.</p>
+        </div>
+        <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 10px; width: 30%; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <i class="bi bi-people" style="font-size: 2em; color: #007bff; margin-bottom: 15px;"></i>
+            <h3 style="color: #333; font-size: 1.5em; margin-bottom: 10px;">Customer Support</h3>
+            <p style="color: #666; font-size: 1em;">Handle customer inquiries and support requests.</p>
+        </div>
+    </section>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    @* Footer Section *@
+    <footer style="margin-top: 40px; padding: 20px 0; background-color: #f8f9fa; border-radius: 10px;">
+        <p style="color: #333; font-size: 1em; margin: 0;">&copy; @DateTime.Now.Year Tangy Store. All rights reserved.</p>
+    </footer>
+</div>
+
+@code {
+    // Code-behind logic (if needed)
+}
